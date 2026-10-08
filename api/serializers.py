@@ -1,7 +1,36 @@
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.db import transaction
+from django.utils import timezone
+from users.models import Profile
+
 from rest_framework import serializers
 from jobs.models import Job, Category
 from applications.models import Application
 from companies.models import Companies
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, validators=[validate_password])
+    user_type = serializers.ChoiceField(choices=Profile.USER_TYPE, write_only=True)
+    phone = serializers.CharField(max_length=15, required=False, allow_blank=True, default='', write_only=True)
+    location = serializers.CharField(max_length=30, required=False, allow_blank=True, default='', write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'user_type', 'phone', 'location']
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user_type = validated_data.pop('user_type')
+        phone = validated_data.pop('phone')
+        location = validated_data.pop('location')
+        user = User.objects.create_user(**validated_data)
+        Profile.objects.create(
+            user=user, user_type=user_type,
+            phone=phone, location=location, skills=''
+        )
+        return user
 
 
 class CategorySerializer(serializers.ModelSerializer):
