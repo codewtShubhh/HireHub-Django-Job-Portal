@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Welcome, {{ company.company_name }}</h2>
+<p>Total Applications Received: {{ total_applications }}</p>
+
+<h3>Your Jobs</h3>
+<a href="{% url 'job_create' %}">+ Post New Job</a>
+<ul>
+{% for job in jobs %}
+    <li>
+        {{ job.title }}
+        | <a href="{% url 'job_applicants' job.id %}">View Applicants</a>
+        | <a href="{% url 'job_edit' job.id %}">Edit</a>
+    </li>
+{% empty %}
+    <li>No jobs posted yet.</li>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>My Posted Jobs</h2>
+<a href="{% url 'job_create' %}">+ Post New Job</a>
+
+<ul>
+{% for job in jobs %}
+    <li>
+        <a href="{% url 'job_detail' job.id %}">{{ job.title }}</a>
+        — {{ job.location }} — {{ job.get_job_type_display }}
+        {% if job.is_active %}(Active){% else %}(Closed){% endif %}
+        | <a href="{% url 'job_edit' job.id %}">Edit</a>
+        | <a href="{% url 'job_delete' job.id %}">Delete</a>
+    </li>
+{% empty %}
+    <li>No jobs posted yet.</li>
+{% endfor %}
+</ul>
+{% endblock %}

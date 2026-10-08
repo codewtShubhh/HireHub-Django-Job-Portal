@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>My Dashboard</h2>
+<a href="{% url 'job_list' %}">Browse Jobs</a>
+
+<h3>My Applications</h3>
+<ul>
+{% for app in applications %}
+    <li>{{ app.job.title }} — Status: {{ app.get_status_display }}</li>
+{% empty %}
+    <li>You haven't applied to any jobs yet.</li>
+{% endfor %}
+</ul>
+{% endblock %}
