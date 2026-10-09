@@ -5,13 +5,15 @@ from .serializers import JobSerializer, CategorySerializer, ApplicationSerialize
 from django.contrib.auth.models import User
 from.serializers import RegisterSerializer
 
+from .permissions import IsJobSeeker, IsRecruiter
+
 
 
 class RegisterAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
-    
+
 
 class JobListAPIView(generics.ListAPIView):
     queryset = (
@@ -40,10 +42,16 @@ class CategoryListAPIView(generics.ListAPIView):
 
 class MyApplicationsAPIView(generics.ListCreateAPIView):
     serializer_class = ApplicationSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsJobSeeker()]
+        return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
-        return Application.objects.filter(applicant=self.request.user)
+        return (Application.objects.filter(applicant=self.request.user)
+                .select_related('job', 'job__company'))
 
     def perform_create(self, serializer):
         serializer.save(applicant=self.request.user)
+    

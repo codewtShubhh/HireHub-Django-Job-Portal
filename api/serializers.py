@@ -66,3 +66,13 @@ class ApplicationSerializer(serializers.ModelSerializer):
             'status', 'applied_at', 'updated_at'
         ]
         read_only_fields = ['applicant', 'status', 'applied_at', 'updated_at']
+
+    def validate_job(self, job):
+        user = self.context['request'].user
+        if not job.is_active:
+            raise serializers.ValidationError('This job is no longer active.')
+        if job.deadline and job.deadline < timezone.localdate():
+            raise serializers.ValidationError('The deadline for this job has passed.')
+        if Application.objects.filter(job=job, applicant=user).exists():
+            raise serializers.ValidationError('You have already applied to this job.')
+        return job
