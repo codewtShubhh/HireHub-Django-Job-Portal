@@ -68,8 +68,36 @@ def logout_view(request):
 
 from django.contrib.auth.decorators import login_required
 
+
+
 @login_required
 def profile_view(request):
-    profile = Profile.objects.get(user=request.user)
-    return render(request, 'users/profile.html', {'profile': profile})
-     
+    profile, created = Profile.objects.get_or_create(
+        user=request.user,
+        defaults={
+            'phone': '',
+            'location': '',
+            'skills': '',
+            'experience': 0,
+            'user_type': 'job_seeker',
+        }
+    )
+
+    if request.method == 'POST':
+        form = ProfileForm(
+            request.POST,
+            request.FILES,
+            instance=profile
+        )
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated successfully!')
+            return redirect('profile')
+    else:
+        form = ProfileForm(instance=profile)
+
+    return render(
+        request,
+        'users/profile.html',
+        {'profile': profile, 'form': form}
+    )

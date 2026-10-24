@@ -1,11 +1,337 @@
+
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>My Profile</h2>
-<p><strong>Username:</strong> {{ profile.user.username }}</p>
-<p><strong>Phone:</strong> {{ profile.phone }}</p>
-<p><strong>Location:</strong> {{ profile.location }}</p>
-<p><strong>Skills:</strong> {{ profile.skills }}</p>
-<p><strong>Experience:</strong> {{ profile.experience }} years</p>
-<p><strong>User Type:</strong> {{ profile.user_type }}</p>
+<style>
+    .profile-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        color: #1f2937;
+    }
+
+    .profile-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #1d4ed8, #4338ca);
+        color: white;
+        padding: 32px;
+    }
+
+    .profile-avatar {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255,255,255,.85);
+    }
+
+    .profile-initial {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.18);
+        border: 4px solid rgba(255,255,255,.85);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 42px;
+        font-weight: 700;
+    }
+
+    .profile-section {
+        padding: 28px;
+    }
+
+    .section-heading {
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 22px;
+    }
+
+    .detail-box {
+        height: 100%;
+        padding: 15px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        background: #f9fafb;
+        overflow-wrap: anywhere;
+    }
+
+    .detail-label {
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .detail-value {
+        font-weight: 600;
+        margin-bottom: 0;
+        white-space: normal;
+    }
+
+    .profile-form {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 24px;
+    }
+
+    .profile-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+    .profile-form select,
+    .profile-form textarea {
+        display: block;
+        width: 100%;
+        padding: 11px 13px;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+        background: #fff;
+        color: #111827;
+        box-sizing: border-box;
+    }
+
+    .profile-form input[type="file"] {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        border: 1px dashed #9ca3af;
+        border-radius: 9px;
+        background: white;
+        box-sizing: border-box;
+    }
+
+    .profile-form input:focus,
+    .profile-form select:focus,
+    .profile-form textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+
+    .profile-form label {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 7px;
+    }
+
+    .profile-form .helptext {
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .profile-divider {
+        border-color: #e5e7eb;
+        margin: 0;
+    }
+
+    @media (max-width: 576px) {
+        .profile-header,
+        .profile-section {
+            padding: 20px;
+        }
+
+        .profile-form {
+            padding: 16px;
+        }
+    }
+</style>
+
+<div class="container py-4 py-md-5">
+    <div class="profile-page">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show"
+                     role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="profile-card shadow-sm">
+
+            <!-- Profile header -->
+            <div class="profile-header">
+                <div class="d-flex flex-column flex-sm-row align-items-center gap-4">
+                    <div class="flex-shrink-0">
+                        {% if profile.profile_picture %}
+                            <img src="{{ profile.profile_picture.url }}"
+                                 alt="Profile picture"
+                                 class="profile-avatar">
+                        {% else %}
+                            <div class="profile-initial">
+                                {{ profile.user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="text-center text-sm-start">
+                        <h2 class="h3 fw-bold mb-2">
+                            {{ profile.user.username }}
+                        </h2>
+
+                        <p class="mb-3 opacity-75">
+                            {{ profile.user.email|default:"Email not provided" }}
+                        </p>
+
+                        <span class="badge rounded-pill bg-light text-primary px-3 py-2">
+                            {{ profile.get_user_type_display|default:"User" }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal information -->
+            <div class="profile-section">
+                <h3 class="section-heading">Personal Information</h3>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="detail-box">
+                            <div class="detail-label">Username</div>
+                            <p class="detail-value">{{ profile.user.username }}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="detail-box">
+                            <div class="detail-label">Email Address</div>
+                            <p class="detail-value">
+                                {{ profile.user.email|default:"Not provided" }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="detail-box">
+                            <div class="detail-label">Phone Number</div>
+                            <p class="detail-value">
+                                {{ profile.phone|default:"Not provided" }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="detail-box">
+                            <div class="detail-label">Location</div>
+                            <p class="detail-value">
+                                {{ profile.location|default:"Not provided" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="profile-divider">
+
+            <!-- Professional information -->
+            <div class="profile-section">
+                <h3 class="section-heading">Professional Information</h3>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="detail-box">
+                            <div class="detail-label">Skills</div>
+                            <p class="detail-value">
+                                {{ profile.skills|default:"Not added yet"|linebreaksbr }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="detail-box">
+                            <div class="detail-label">Experience</div>
+                            <p class="detail-value">
+                                {{ profile.experience }} year{{ profile.experience|pluralize }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="detail-box">
+                            <div class="detail-label">Resume</div>
+                            {% if profile.resume %}
+                                <a href="{{ profile.resume.url }}"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="btn btn-sm btn-outline-primary mt-1">
+                                    View Resume
+                                </a>
+                            {% else %}
+                                <p class="detail-value text-muted">
+                                    No resume uploaded yet
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="profile-divider">
+
+            <!-- Edit profile form -->
+            <div class="profile-section">
+                <h3 class="section-heading">Edit Your Profile</h3>
+                <p class="text-muted mb-4">
+                    Keep your contact and professional details up to date.
+                </p>
+
+                <form method="POST"
+                      enctype="multipart/form-data"
+                      class="profile-form">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div class="mb-4">
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <div class="helptext mt-1">
+                                    {{ field.help_text }}
+                                </div>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary px-4 py-2">
+                            Save Changes
+                        </button>
+
+                        <a href="{% url 'home' %}"
+                           class="btn btn-outline-secondary px-4 py-2">
+                            Back to Home
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
 {% endblock %}
