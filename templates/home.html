@@ -1,6 +1,434 @@
+
 {% extends 'base.html' %}
 
+{% block title %}HireHub | Find Your Next Opportunity{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        padding: 64px 0 56px;
+        text-align: center;
+    }
+
+    .hero-badge {
+        display: inline-block;
+        padding: 8px 15px;
+        border: 1px solid #dbeafe;
+        border-radius: 50px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 22px;
+    }
+
+    .hero-title {
+        max-width: 850px;
+        margin: 0 auto 20px;
+        color: #172033;
+        font-size: clamp(36px, 5vw, 60px);
+        font-weight: 800;
+        letter-spacing: -2px;
+        line-height: 1.12;
+    }
+
+    .hero-title span {
+        color: #2563eb;
+    }
+
+    .hero-description {
+        max-width: 650px;
+        margin: 0 auto 28px;
+        color: #64748b;
+        font-size: 18px;
+        line-height: 1.8;
+    }
+
+    .hero-actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .hero-actions .btn {
+        padding: 13px 22px;
+    }
+
+    .section-heading {
+        margin-bottom: 8px;
+        color: #172033;
+        font-size: clamp(25px, 3vw, 34px);
+        font-weight: 800;
+        letter-spacing: -0.8px;
+    }
+
+    .section-description {
+        color: #64748b;
+    }
+
+    .feature-card,
+    .job-card,
+    .cta-card {
+        height: 100%;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        background: #fff;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .feature-card {
+        padding: 25px;
+    }
+
+    .feature-card:hover,
+    .job-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, .07);
+    }
+
+    .feature-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        margin-bottom: 18px;
+        border-radius: 12px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 23px;
+    }
+
+    .feature-card h3 {
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .feature-card p {
+        margin-bottom: 0;
+        color: #64748b;
+        line-height: 1.7;
+    }
+
+    .job-card {
+        padding: 22px;
+    }
+
+    .job-company {
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .job-title {
+        color: #172033;
+        font-size: 19px;
+        font-weight: 700;
+        text-decoration: none;
+        overflow-wrap: anywhere;
+    }
+
+    .job-title:hover {
+        color: #2563eb;
+    }
+
+    .job-meta {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .job-tag {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 7px;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .salary-text {
+        color: #172033;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .cta-card {
+        padding: 32px;
+    }
+
+    .cta-card p {
+        color: #64748b;
+        line-height: 1.7;
+    }
+
+    .empty-jobs {
+        padding: 38px 20px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 16px;
+        background: #fff;
+        text-align: center;
+    }
+
+    @media (max-width: 575.98px) {
+        .hero-section {
+            padding: 38px 0;
+        }
+
+        .hero-title {
+            letter-spacing: -1px;
+        }
+
+        .hero-description {
+            font-size: 16px;
+        }
+
+        .cta-card {
+            padding: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>Welcome to HireHub!</h1>
-<p>Find your next job or hire top talent.</p>
+
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-badge">
+            <i class="bi bi-stars me-1"></i>
+            Your next opportunity starts here
+        </div>
+
+        <h1 class="hero-title">
+            Find work that moves<br>
+            <span>your future forward.</span>
+        </h1>
+
+        <p class="hero-description">
+            Discover opportunities that match your skills and ambitions,
+            or connect with talented people who can help your business grow.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{% url 'job_list' %}" class="btn hh-btn-primary">
+                <i class="bi bi-search me-2"></i>Explore Jobs
+            </a>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn hh-btn-outline">
+                    <i class="bi bi-grid me-2"></i>Go to Dashboard
+                </a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn hh-btn-outline">
+                    <i class="bi bi-person-plus me-2"></i>Create an Account
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="pb-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h3>Discover Opportunities</h3>
+                    <p>
+                        Explore active job listings and find opportunities
+                        that fit your skills and career goals.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                    <h3>Showcase Your Skills</h3>
+                    <p>
+                        Build your profile, share your experience, and
+                        apply for jobs that interest you.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h3>Hire Great Talent</h3>
+                    <p>
+                        Create a company profile, publish openings, and
+                        manage your recruitment opportunities.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between
+                    align-items-md-end gap-3 mb-4">
+            <div>
+                <h2 class="section-heading">Latest Opportunities</h2>
+                <p class="section-description mb-0">
+                    Explore the newest active jobs on HireHub.
+                </p>
+            </div>
+
+            <a href="{% url 'job_list' %}"
+               class="text-primary fw-semibold text-decoration-none">
+                View all jobs <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for job in featured_jobs %}
+                <div class="col-md-6">
+                    <div class="job-card">
+                        <div class="d-flex justify-content-between
+                                    align-items-start gap-3 mb-3">
+                            <div>
+                                <a href="{% url 'job_detail' job.id %}"
+                                   class="job-title">
+                                    {{ job.title }}
+                                </a>
+
+                                <div class="job-company mt-1">
+                                    {{ job.company.company_name }}
+                                </div>
+                            </div>
+
+                            <span class="job-tag">
+                                {{ job.get_job_type_display }}
+                            </span>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-3 mb-3 job-meta">
+                            <span>
+                                <i class="bi bi-geo-alt me-1"></i>
+                                {{ job.location }}
+                            </span>
+
+                            {% if job.category %}
+                                <span>
+                                    <i class="bi bi-grid me-1"></i>
+                                    {{ job.category.name }}
+                                </span>
+                            {% endif %}
+
+                            <span>
+                                <i class="bi bi-clock me-1"></i>
+                                {{ job.created_at|date:"d M Y" }}
+                            </span>
+                        </div>
+
+                        {% if job.salary_min or job.salary_max %}
+                            <div class="salary-text mb-3">
+                                <i class="bi bi-currency-rupee me-1"></i>
+                                {% if job.salary_min %}
+                                    {{ job.salary_min|floatformat:0 }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                                –
+                                {% if job.salary_max %}
+                                    {{ job.salary_max|floatformat:0 }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <a href="{% url 'job_detail' job.id %}"
+                           class="btn hh-btn-outline w-100 mt-2">
+                            View Job Details
+                            <i class="bi bi-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-jobs">
+                        <i class="bi bi-briefcase fs-1 text-secondary"></i>
+                        <h3 class="h5 fw-bold mt-3">No active jobs yet</h3>
+                        <p class="text-secondary mb-3">
+                            New opportunities will appear here when recruiters
+                            publish their jobs.
+                        </p>
+                        <a href="{% url 'job_list' %}"
+                           class="btn hh-btn-primary px-4">
+                            Browse Jobs
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="cta-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+                    <h2 class="h4 fw-bold">Ready for your next role?</h2>
+                    <p>
+                        Explore job openings, build your profile, and take
+                        the next step in your career.
+                    </p>
+                    <a href="{% url 'job_list' %}"
+                       class="btn hh-btn-primary px-4">
+                        Find a Job <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="cta-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <h2 class="h4 fw-bold">Looking for great talent?</h2>
+                    <p>
+                        Set up your company profile and publish openings
+                        to connect with potential candidates.
+                    </p>
+
+                    {% if user.is_authenticated %}
+                        {% if user.profile.user_type == 'recruiter' %}
+                            <a href="{% url 'job_create' %}"
+                               class="btn hh-btn-primary px-4">
+                                Post a Job
+                                <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'register' %}"
+                               class="btn hh-btn-outline px-4">
+                                Recruiter Registration
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'register' %}"
+                           class="btn hh-btn-outline px-4">
+                            Join HireHub
+                            <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 {% endblock %}

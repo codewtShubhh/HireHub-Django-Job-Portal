@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Job
 from .forms import JobForm
 from companies.models import Companies
+from django.core.paginator import Paginator
 
 
 def _is_recruiter(user):
@@ -108,6 +109,41 @@ def job_detail_view(request, job_id):
     return render(request, 'jobs/job_detail.html', {'job': job})
 
 
+
+
 def job_list_view(request):
-    jobs = Job.objects.filter(is_active=True).order_by('-created_at')
-    return render(request, 'jobs/job_list.html', {'jobs': jobs})
+    jobs = Job.objects.filter(is_active=True).select_related(
+        'company', 'category'
+    ).order_by('-created_at')
+
+    search_query = request.GET.get('q', '').strip()
+    location_query = request.GET.get('location', '').strip()
+    category_id = request.GET.get('category', '').strip()
+
+    if search_query:
+        jobs = jobs.filter(title__icontains=search_query)
+
+    if location_query:
+        jobs = jobs.filter(location__icontains=location_query)
+
+    if category_id.isdigit():
+        jobs = jobs.filter(category_id=int(category_id))
+
+    from .models import Category
+    categories = Category.objects.all().order_by('name')
+
+    # Pagination: show 10 jobs per page
+    paginator = Paginator(jobs, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'jobs': page_obj,
+        'page_obj': page_obj,
+        'categories': categories,
+        'search_query': search_query,
+        'location_query': location_query,
+        'selected_category': category_id,
+    }
+
+    return render(request, 'jobs/job_list.html', context)

@@ -5,13 +5,22 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Profile
 from .forms import ProfileForm
+from jobs.models import Job
 
 
 # Create your views here.
 
 
 def home(request):
-    return render(request, 'home.html')
+    featured_jobs = Job.objects.filter(
+        is_active = True
+    ).select_related(
+        'company', 'category'
+    ).order_by('-created_at')[:4]
+
+    return render(request, 'home.html', {
+        'featured_jobs': featured_jobs
+    })
 
 
 
